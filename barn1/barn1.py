@@ -5,7 +5,6 @@ TASK: barn1
 """
 import sys
 sys.stderr.write('message')
-import heapq
 
 with open('barn1.in', 'r') as fin:
     M, S, C = map(int, fin.readline().strip().split())
