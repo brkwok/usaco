@@ -11,59 +11,44 @@ with open('ariprog.in', 'r') as fin:
     N = int(fin.readline().strip())
     M = int(fin.readline().strip())
 
-    bisquares = sorted(list(set(i ** 2 + j ** 2 for i in range(0, M + 1) for j in range(i, M + 1))))
+    bisquares = set()
+    for i in range(M + 1):
+        for j in range(i, M + 1):
+            bisquares.add(i*i + j*j)
+    
+    list_bs = sorted(list(bisquares))
+    L = len(list_bs)
     res = []
 
-    def dfs(i, curr, diff):        
-        if len(curr) >= N:
-            res.append([curr[0], curr[1] - curr[0]])
-            return
-        
-        if i >= len(bisquares):
-            return
-        
-        if not curr or len(curr) == 1:
-            curr.append(bisquares[i])
-            dfs(i + 1, curr)
-            curr.pop()
-        else:
-            diff = curr[1] - curr[0]
-            diff2 = bisquares[i] - curr[-1]
-            
-            if diff == diff2:
-                curr.append(bisquares[i])
-                dfs(i + 1, curr)
-                curr.pop()
-        dfs(i + 1, curr, diff)
+    for i in range(L - 1, N - 2, -1):
+        end = list_bs[i]
+        diff = 1
+        max_step = end // (N - 1)
+        next_seq = list_bs[i - diff]
+        curr_step = end - next_seq
 
-    # def solve(first, second, j):
-    #     diff = second - first
-    #     curr = second
+        while curr_step <= max_step:
+            is_inset = True
 
-    #     for k in range(j + 1, len(bisquares)):
-    #         diff2 = bisquares[k] - curr
-    #         # print(diff, diff2)
-    #         if diff2 == diff:
-    #             curr = bisquares[k]
+            for n in range(N - 2):
+                next_seq -= curr_step
 
-    #             if (curr - first) // diff == N - 1:
-    #                 res.append([first, diff])
-    #                 return
-    #         elif diff2 > diff:
-    #             break
+                if next_seq not in bisquares:
+                    is_inset = False
+                    break
+                
+            if is_inset:
+                res.append((end - curr_step * (N - 1), curr_step))
 
-
-    # for i in range(len(bisquares)):
-    #     for j in range(i + 1, len(bisquares)):
-    #         solve(bisquares[i], bisquares[j], j)
+            diff += 1
+            next_seq = list_bs[i - diff]
+            curr_step = end - next_seq
 
     res.sort(key= lambda x: (x[1], x[0]))
-    
+
     with open('ariprog.out', 'w') as fout:
         if res:
             for x,y in res:
                 fout.write(f'{x} {y}\n')
         else:
-            fout.write("NONE\n")
-
-    
+            fout.write('NONE\n')
